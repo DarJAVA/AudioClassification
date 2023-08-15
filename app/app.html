@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Classification App</title>
+</head>
+<body>
+    <h1>Audio Classification App</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="audio" accept=".wav">
+        <button type="submit">Classify</button>
+    </form>
+
+<div id="result">
+    <p id="prediction-text">Predicted class:</p>
+    <h2 id="predicted-class"></h2>
+</div>
+
+<script>
+    const form = document.getElementById('upload-form');
+    const resultDiv = document.getElementById('result');
+    const predictionText = document.getElementById('prediction-text');
+    const predictedClass = document.getElementById('predicted-class');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/classify', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                resultDiv.textContent = data.error;
+                predictionText.style.display = 'none';
+                predictedClass.style.display = 'none';
+            } else {
+                predictionText.style.display = 'block';
+                predictedClass.textContent = data.predicted_class;
+                predictedClass.style.display = 'block';
+            }
+        } catch (error) {
+            resultDiv.textContent = 'An error occurred';
+            predictionText.style.display = 'none';
+            predictedClass.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
